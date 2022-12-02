@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.moviedetails.MovieDetailsFragment">
+
+    <data>
+
+        <variable
+            name="movie"
+            type="com.example.movies.data.model.Movie" />
+
+        <variable
+            name="details"
+            type="com.example.movies.data.model.MovieDetails" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:transitionGroup="true">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            app:liftOnScroll="true">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:navigationIcon="@drawable/ic_baseline_arrow_back_24" />
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="?actionBarSize">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/backdrop"
+                    allowHardware="@{false}"
+                    imageUrl="@{movie.backdropPath ?? details.backdropPath}"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="16dp"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintDimensionRatio="16:9"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="?shapeAppearanceCornerLarge"
+                    tools:src="@tools:sample/avatars" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cover"
+                    style="?materialCardViewElevatedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:cardElevation="12dp"
+                    app:layout_constraintBottom_toBottomOf="@id/backdrop"
+                    app:layout_constraintDimensionRatio="133:200"
+                    app:layout_constraintEnd_toEndOf="@id/backdrop"
+                    app:layout_constraintStart_toStartOf="@id/backdrop"
+                    app:layout_constraintTop_toBottomOf="@id/backdrop"
+                    app:layout_constraintWidth_percent="0.35">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/posterPath"
+                        allowHardware="@{false}"
+                        error="@{@drawable/movie_placeholder}"
+                        imageUrl="@{movie.posterPath ?? details.posterPath}"
+                        placeholder="@{@drawable/movie_placeholder}"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        app:shapeAppearance="?shapeAppearanceCornerMedium"
+                        tools:src="@tools:sample/avatars" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center"
+                    android:text="@{movie.title ?? details.releaseDate}"
+                    android:textAppearance="?textAppearanceHeadlineLarge"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cover"
+                    tools:text="@tools:sample/lorem" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/date"
+                    yearFromDate="@{movie.releaseDate ?? details.releaseDate}"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:textAppearance="?textAppearanceBodyMedium"
+                    app:layout_constraintEnd_toEndOf="@id/title"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@id/title"
+                    app:layout_constraintTop_toBottomOf="@+id/title"
+                    tools:text="@tools:sample/date/ddmmyy" />
+
+                <androidx.appcompat.widget.AppCompatRatingBar
+                    android:id="@+id/rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/date" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@{movie.overview ?? details.overview}"
+                    android:textAppearance="?textAppearanceBodyLarge"
+                    app:layout_constraintEnd_toEndOf="@id/title"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@id/title"
+                    app:layout_constraintTop_toBottomOf="@+id/rating"
+                    tools:text="@tools:sample/lorem/random" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
