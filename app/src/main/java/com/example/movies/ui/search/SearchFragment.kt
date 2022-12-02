@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doAfterTextChanged
@@ -14,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.example.movies.adapter.MovieListAdapter
 import com.example.movies.adapter.MoviesLoadStateAdapter
 import com.example.movies.databinding.FragmentSearchBinding
@@ -27,7 +29,7 @@ class SearchFragment : Fragment() {
     private val viewModel: SearchViewModel by viewModel()
     private lateinit var binding: FragmentSearchBinding
 
-    private val movieListAdapter = MovieListAdapter { _, movie ->
+    private val searchResultAdapter = MovieListAdapter { _, movie ->
         findNavController().navigate(SearchFragmentDirections.actionToMovieDetails(movie))
     }
 
@@ -65,14 +67,22 @@ class SearchFragment : Fragment() {
 
             toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-            searchResults.adapter = movieListAdapter.withLoadStateHeaderAndFooter(
-                header = MoviesLoadStateAdapter(movieListAdapter::retry),
-                footer = MoviesLoadStateAdapter(movieListAdapter::retry)
+            searchResults.adapter = searchResultAdapter.withLoadStateHeaderAndFooter(
+                header = MoviesLoadStateAdapter(searchResultAdapter::retry),
+                footer = MoviesLoadStateAdapter(searchResultAdapter::retry)
             )
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    viewModel.dataFlow.collectLatest(movieListAdapter::submitData)
+                    viewModel.dataFlow.collectLatest(searchResultAdapter::submitData)
+                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    searchResultAdapter.loadStateFlow.collect { states ->
+                        progress.isVisible = states.refresh == LoadState.Loading
+                    }
                 }
             }
         }
