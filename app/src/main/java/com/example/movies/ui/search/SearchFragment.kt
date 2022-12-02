@@ -11,17 +11,13 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.example.movies.adapter.MovieListAdapter
 import com.example.movies.adapter.MoviesLoadStateAdapter
 import com.example.movies.databinding.FragmentSearchBinding
+import com.example.movies.utils.extensions.collectOnCreated
 import com.google.android.material.transition.MaterialSharedAxis
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -50,18 +46,14 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         with(binding) {
 
-            inputSearch.doAfterTextChanged {
-                viewModel.updateQuery(it.toString())
-            }
+            inputSearch.doAfterTextChanged { viewModel.updateQuery(it.toString()) }
 
             ViewCompat.setOnApplyWindowInsetsListener(container) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
                 searchResults.updatePaddingRelative(
                     start = insets.left, top = 0, end = insets.right, bottom = insets.bottom
                 )
-                toolbar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    topMargin = insets.top
-                }
+                toolbar.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = insets.top }
                 WindowInsetsCompat.CONSUMED
             }
 
@@ -72,18 +64,10 @@ class SearchFragment : Fragment() {
                 footer = MoviesLoadStateAdapter(searchResultAdapter::retry)
             )
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    viewModel.dataFlow.collectLatest(searchResultAdapter::submitData)
-                }
-            }
+            viewModel.dataFlow.collectOnCreated(viewLifecycleOwner, searchResultAdapter::submitData)
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    searchResultAdapter.loadStateFlow.collect { states ->
-                        progress.isVisible = states.refresh == LoadState.Loading
-                    }
-                }
+            searchResultAdapter.loadStateFlow.collectOnCreated(viewLifecycleOwner) { states ->
+                progress.isVisible = states.refresh == LoadState.Loading
             }
         }
     }

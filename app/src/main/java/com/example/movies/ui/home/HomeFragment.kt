@@ -7,9 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,9 +15,8 @@ import com.example.movies.R
 import com.example.movies.adapter.MovieListAdapter
 import com.example.movies.adapter.MoviesLoadStateAdapter
 import com.example.movies.databinding.FragmentHomeBinding
+import com.example.movies.utils.extensions.collectOnCreated
 import com.google.android.material.transition.MaterialSharedAxis
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
@@ -28,13 +24,9 @@ class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel by viewModel<HomeViewModel>()
     private val movieListAdapter = MovieListAdapter { _, movie ->
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, false)
         findNavController().navigate(HomeFragmentDirections.actionToMovieDetails(movie))
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
     }
 
     override fun onCreateView(
@@ -63,25 +55,13 @@ class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
 
             movieList.addOnScrollListener(MoviesListScrollListener())
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    viewModel.dataFlow.collectLatest(movieListAdapter::submitData)
-                }
-            }
+            viewModel.dataFlow.collectOnCreated(viewLifecycleOwner, movieListAdapter::submitData)
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    viewModel.sortFlow.collectLatest { movieListAdapter.refresh() }
-                }
-            }
+            viewModel.sortFlow.collectOnCreated(viewLifecycleOwner) { movieListAdapter.refresh() }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    movieListAdapter.loadStateFlow.collectLatest { states ->
-                        refresher.isRefreshing =
-                            states.refresh == LoadState.Loading || states.prepend == LoadState.Loading
-                    }
-                }
+            movieListAdapter.loadStateFlow.collectOnCreated(viewLifecycleOwner) { states ->
+                refresher.isRefreshing =
+                    states.refresh == LoadState.Loading || states.prepend == LoadState.Loading
             }
         }
     }
@@ -100,7 +80,12 @@ class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_search -> findNavController().navigate(HomeFragmentDirections.actionToSearch())
+            R.id.nav_search -> {
+                exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+                reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+                findNavController().navigate(HomeFragmentDirections.actionToSearch())
+            }
+
             R.id.nav_sort -> findNavController().navigate(HomeFragmentDirections.actionToNavSort())
         }
         return true

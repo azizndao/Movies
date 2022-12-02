@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.movies.databinding.FragmentSortBottomSheetBinding
+import com.example.movies.utils.extensions.collectOnCreated
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -39,11 +37,7 @@ class SortBottomSheetFragment : BottomSheetDialogFragment() {
         with(binding) {
             sortKeys.adapter = sortAdapter
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    viewModel.uiStateFlow.collectLatest { uiState -> sortAdapter.submitList(uiState) }
-                }
-            }
+            viewModel.uiStateFlow.collectOnCreated(viewLifecycleOwner, sortAdapter::submitList)
         }
     }
 }
