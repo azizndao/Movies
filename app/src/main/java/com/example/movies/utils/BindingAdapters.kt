@@ -12,6 +12,7 @@ import coil.load
     "placeholder",
     "error",
     "allowHardware",
+    "imageWidth",
     requireAll = false
 )
 fun ImageView.loadImage(
@@ -20,9 +21,14 @@ fun ImageView.loadImage(
     placeholder: Drawable?,
     error: Drawable?,
     allowHardware: Boolean?,
-) {
+    imageWidth: Int? = null,
+
+    ) {
     val url = when {
-        themoviedb != false && imageUrl != null -> "${Constants.MOVIE_IMAGE_BASE_URL}${imageUrl}"
+        themoviedb != false && imageUrl != null -> imageWidth?.let {
+            ImageHelper.getImage(it, imageUrl)
+        } ?: ImageHelper.getImage(imageUrl)
+
         else -> imageUrl
     }
     load(url) {

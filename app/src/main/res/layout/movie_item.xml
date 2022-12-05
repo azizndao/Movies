@@ -29,6 +29,7 @@
             placeholder="@{@drawable/movie_placeholder}"
             android:layout_width="0dp"
             android:layout_height="150dp"
+            imageWidth="@{200}"
             android:background="?colorPrimaryContainer"
             android:scaleType="centerCrop"
             app:layout_constraintDimensionRatio="133:200"

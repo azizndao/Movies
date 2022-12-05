@@ -24,9 +24,8 @@ class UserPreferences(private val context: Context) {
             ?: SortKey.POPULARITY.key
 
         val sortKey = SortKey.values().find { it.key == key }!!.key
-        val sortAscendant = preferences[keySortAscendant] ?: true
+        val sortAscendant = preferences[keySortAscendant] ?: false
         sortKey to sortAscendant
-
     }
 
     suspend fun setSort(key: String, ascendant: Boolean) {

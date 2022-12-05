@@ -20,7 +20,7 @@ class MovieApiServiceImpl(
     ): MovieLists {
         val response = httpClient.get("https://api.themoviedb.org/3/discover/movie") {
             parameter("api_key", Constants.MOVIES_API_KEY)
-            parameter("language", "en-US")
+            parameter("language", language)
             parameter("with_watch_monetization_types", "flatrate")
             parameter("sort_by", "${sortKey}.${if (ascendant) "asc" else "desc"}")
             parameter("page", page)
@@ -32,7 +32,7 @@ class MovieApiServiceImpl(
     override suspend fun searchMovie(query: String, page: Int, language: String): MovieLists {
         val response = httpClient.get("https://api.themoviedb.org/3/search/movie") {
             parameter("api_key", Constants.MOVIES_API_KEY)
-            parameter("language", "en-US")
+            parameter("language", language)
             parameter("query", query)
             parameter("page", page)
         }
