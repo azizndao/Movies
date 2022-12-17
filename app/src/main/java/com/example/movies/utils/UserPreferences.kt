@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.movies.data.model.SortKey
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class UserPreferences(private val context: Context) {
@@ -36,8 +37,12 @@ class UserPreferences(private val context: Context) {
         }
     }
 
+    fun getTranslation(): Flow<String> = dataStore.data.map { it[keyTranslation] ?: "en-US" }
+
+    suspend fun setTranslation(code: String) = dataStore.edit { it[keyTranslation] = code }
 }
 
 
 private val keySortKey = stringPreferencesKey("sort_key")
 private val keySortAscendant = booleanPreferencesKey("sort_ascendant")
+private val keyTranslation = stringPreferencesKey("current_translation")

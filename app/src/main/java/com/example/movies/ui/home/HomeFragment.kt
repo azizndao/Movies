@@ -12,9 +12,10 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movies.R
-import com.example.movies.adapter.MovieListAdapter
-import com.example.movies.adapter.MoviesLoadStateAdapter
+import com.example.movies.adapter.TheMovieListAdapter
+import com.example.movies.adapter.TheMoviesLoadStateAdapter
 import com.example.movies.databinding.FragmentHomeBinding
+import com.example.movies.ui.moviedetails.DataType
 import com.example.movies.utils.extensions.collectOnCreated
 import com.google.android.material.transition.MaterialSharedAxis
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -23,10 +24,19 @@ class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
 
     private lateinit var binding: FragmentHomeBinding
     private val viewModel by viewModel<HomeViewModel>()
-    private val movieListAdapter = MovieListAdapter { _, movie ->
+    private val movieListAdapter = TheMovieListAdapter { _, movie ->
         exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, true)
         reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, false)
-        findNavController().navigate(HomeFragmentDirections.actionToMovieDetails(movie))
+        findNavController().navigate(
+            HomeFragmentDirections.actionToMovieDetails(movie.id, DataType.MOVIE)
+        )
+    }
+    private val tvListAdapter = TheMovieListAdapter { _, movie ->
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, false)
+        findNavController().navigate(
+            HomeFragmentDirections.actionToMovieDetails(movie.id, DataType.TV_SHOW)
+        )
     }
 
     override fun onCreateView(
@@ -44,20 +54,31 @@ class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
 
             toolbar.setOnMenuItemClickListener(this@HomeFragment)
 
-            refresher.setOnRefreshListener(movieListAdapter::refresh)
+            refresher.setOnRefreshListener {
+                movieListAdapter.refresh()
+                tvListAdapter.refresh()
+            }
 
             movieList.adapter = movieListAdapter.withLoadStateHeaderAndFooter(
-                header = MoviesLoadStateAdapter(movieListAdapter::retry),
-                footer = MoviesLoadStateAdapter(movieListAdapter::retry)
+                header = TheMoviesLoadStateAdapter(movieListAdapter::retry),
+                footer = TheMoviesLoadStateAdapter(movieListAdapter::retry)
             )
 
-            setOnScrollToTop { movieList.smoothScrollToPosition(0) }
+            tvList.adapter = tvListAdapter.withLoadStateHeaderAndFooter(
+                header = TheMoviesLoadStateAdapter(movieListAdapter::retry),
+                footer = TheMoviesLoadStateAdapter(movieListAdapter::retry)
+            )
+
+            fabScrollUp.setOnClickListener { movieList.smoothScrollToPosition(0) }
 
             movieList.addOnScrollListener(MoviesListScrollListener())
 
-            viewModel.dataFlow.collectOnCreated(viewLifecycleOwner, movieListAdapter::submitData)
+            viewModel.moviesDataFlow.collectOnCreated(
+                viewLifecycleOwner,
+                movieListAdapter::submitData
+            )
 
-            viewModel.sortFlow.collectOnCreated(viewLifecycleOwner) { movieListAdapter.refresh() }
+            viewModel.tvDataFlow.collectOnCreated(viewLifecycleOwner, tvListAdapter::submitData)
 
             movieListAdapter.loadStateFlow.collectOnCreated(viewLifecycleOwner) { states ->
                 refresher.isRefreshing =
@@ -80,13 +101,7 @@ class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_search -> {
-                exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-                reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
-                findNavController().navigate(HomeFragmentDirections.actionToSearch())
-            }
-
-            R.id.nav_sort -> findNavController().navigate(HomeFragmentDirections.actionToNavSort())
+            R.id.nav_translations -> findNavController().navigate(HomeFragmentDirections.actionToNavTranslations())
         }
         return true
     }

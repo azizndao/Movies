@@ -24,12 +24,21 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
+        }
+
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -38,11 +47,15 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        dataBinding = true
+        viewBinding = true
     }
 }
 
 dependencies {
+    implementation("androidx.palette:palette:1.0.0")
+
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0")
+
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation("io.coil-kt:coil:2.2.2")
@@ -55,7 +68,7 @@ dependencies {
     val koinAndroidVersion = "3.3.0"
     implementation("io.insert-koin:koin-android:$koinAndroidVersion")
 
-    val ktorVersion = "2.1.3"
+    val ktorVersion = "2.2.1"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")

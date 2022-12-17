@@ -2,6 +2,7 @@ package com.example.movies.data.model
 
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -9,6 +10,7 @@ import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.*
 
 
+@Keep
 @Parcelize
 @Serializable
 data class Movie(
@@ -29,7 +31,7 @@ data class Movie(
     val originalTitle: String,
 
     val overview: String,
-    val popularity: Double,
+    val popularity: Float,
 
     @SerialName("poster_path")
     val posterPath: String? = null,
@@ -41,7 +43,7 @@ data class Movie(
     val video: Boolean,
 
     @SerialName("vote_average")
-    val voteAverage: Double,
+    val voteAverage: Float,
 
     @SerialName("vote_count")
     val voteCount: Long

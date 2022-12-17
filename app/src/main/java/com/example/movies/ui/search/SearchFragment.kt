@@ -13,9 +13,10 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import com.example.movies.adapter.MovieListAdapter
-import com.example.movies.adapter.MoviesLoadStateAdapter
+import com.example.movies.adapter.TheMovieGridAdapter
+import com.example.movies.adapter.TheMoviesLoadStateAdapter
 import com.example.movies.databinding.FragmentSearchBinding
+import com.example.movies.ui.moviedetails.DataType
 import com.example.movies.utils.extensions.collectOnCreated
 import com.google.android.material.transition.MaterialSharedAxis
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -25,8 +26,8 @@ class SearchFragment : Fragment() {
     private val viewModel: SearchViewModel by viewModel()
     private lateinit var binding: FragmentSearchBinding
 
-    private val searchResultAdapter = MovieListAdapter { _, movie ->
-        findNavController().navigate(SearchFragmentDirections.actionToMovieDetails(movie))
+    private val searchResultAdapter = TheMovieGridAdapter { _, movie ->
+        findNavController().navigate(SearchFragmentDirections.actionToMovieDetails(movie.id, DataType.MOVIE))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,8 +61,8 @@ class SearchFragment : Fragment() {
             toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
             searchResults.adapter = searchResultAdapter.withLoadStateHeaderAndFooter(
-                header = MoviesLoadStateAdapter(searchResultAdapter::retry),
-                footer = MoviesLoadStateAdapter(searchResultAdapter::retry)
+                header = TheMoviesLoadStateAdapter(searchResultAdapter::retry),
+                footer = TheMoviesLoadStateAdapter(searchResultAdapter::retry)
             )
 
             viewModel.dataFlow.collectOnCreated(viewLifecycleOwner, searchResultAdapter::submitData)

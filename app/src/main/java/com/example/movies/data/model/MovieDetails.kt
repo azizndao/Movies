@@ -30,7 +30,7 @@ data class MovieDetails(
     val originalTitle: String,
 
     val overview: String,
-    val popularity: Double,
+    val popularity: Float,
 
     @SerialName("poster_path")
     val posterPath: String?,
@@ -56,7 +56,7 @@ data class MovieDetails(
     val video: Boolean,
 
     @SerialName("vote_average")
-    val voteAverage: Double,
+    val voteAverage: Float,
 
     @SerialName("vote_count")
     val voteCount: Long

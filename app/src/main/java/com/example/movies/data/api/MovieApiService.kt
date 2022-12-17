@@ -1,18 +1,42 @@
 package com.example.movies.data.api
 
+import com.example.movies.data.model.Genre
+import com.example.movies.data.model.Movie
 import com.example.movies.data.model.MovieDetails
-import com.example.movies.data.model.MovieLists
+import com.example.movies.data.model.SortKey
+import com.example.movies.data.model.TheMovieResponse
+import com.example.movies.data.model.Video
 
 interface MovieApiService {
 
     suspend fun getMoviesList(
         page: Int,
-        sortKey: String,
+        sortKey: String = SortKey.POPULARITY.key,
         language: String = "en-US",
-        ascendant: Boolean
-    ): MovieLists
+        ascendant: Boolean = true
+    ): TheMovieResponse<Movie>
 
-    suspend fun searchMovie(query: String, page: Int, language: String = "en-US"): MovieLists
+    suspend fun getPopular(page: Int, language: String = "en-US"): TheMovieResponse<Movie>
+
+    suspend fun getTopRated(page: Int, language: String = "en-US"): TheMovieResponse<Movie>
+
+    suspend fun getUpcoming(page: Int, language: String = "en-US"): TheMovieResponse<Movie>
+
+    suspend fun getNowPlaying(page: Int, language: String = "en-US"): TheMovieResponse<Movie>
+
+    suspend fun getLatest(page: Int, language: String = "en-US"): TheMovieResponse<Movie>
+
+    suspend fun searchMovie(
+        query: String,
+        page: Int,
+        language: String = "en-US"
+    ): TheMovieResponse<Movie>
 
     suspend fun getMovieDetails(id: Long, language: String = "en-US"): MovieDetails
+
+    suspend fun getSimilarMovies(id: Long, language: String = "en-US"): TheMovieResponse<Movie>
+
+    suspend fun getAllGenres(language: String = "en-US"): List<Genre>
+
+    suspend fun getMovieVideos(movieId: Long, language: String = "en-US"): List<Video>
 }
