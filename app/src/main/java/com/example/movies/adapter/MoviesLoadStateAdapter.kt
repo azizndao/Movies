@@ -30,7 +30,7 @@ class MoviesLoadStateAdapter(
     ) {
 
         private val binding = MovieLoadStateItemBinding.bind(itemView).apply {
-            setOnRetry { retry() }
+            btnRetry.setOnClickListener { retry() }
         }
 
         fun bind(loadState: LoadState) {

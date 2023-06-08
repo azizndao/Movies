@@ -9,7 +9,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movies.R
 import com.example.movies.adapter.MovieListAdapter
@@ -51,7 +51,7 @@ class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
                 footer = MoviesLoadStateAdapter(movieListAdapter::retry)
             )
 
-            setOnScrollToTop { movieList.smoothScrollToPosition(0) }
+            fabScrollUp.setOnClickListener { movieList.smoothScrollToPosition(0) }
 
             movieList.addOnScrollListener(MoviesListScrollListener())
 
@@ -69,7 +69,7 @@ class HomeFragment : Fragment(), Toolbar.OnMenuItemClickListener {
     inner class MoviesListScrollListener : RecyclerView.OnScrollListener() {
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+            val layoutManager = recyclerView.layoutManager as GridLayoutManager
             if (layoutManager.findFirstVisibleItemPosition() > 7) {
                 binding.fabScrollUp.show()
             } else {

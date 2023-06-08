@@ -9,6 +9,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.movies.databinding.FragmentMovieDetailsBinding
 import com.example.movies.utils.extensions.collectOnCreated
+import com.example.movies.utils.loadImage
+import com.example.movies.utils.yearFromDate
 import com.google.android.material.transition.MaterialSharedAxis
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -36,10 +38,14 @@ class MovieDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         with(binding) {
             toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-            movie = args.movie
+            backdrop.loadImage(args.movie.backdropPath)
+            posterPath.loadImage(args.movie.posterPath)
+            title.text = args.movie.title
+            date.yearFromDate(args.movie.releaseDate)
+            description.text = args.movie.overview
             rating.rating = (args.movie.voteAverage / 2f).toFloat()
         }
 
-        viewModel.uiState.collectOnCreated(viewLifecycleOwner) { binding.details = it }
+        viewModel.uiState.collectOnCreated(viewLifecycleOwner) { binding.description.text = it.overview }
     }
 }

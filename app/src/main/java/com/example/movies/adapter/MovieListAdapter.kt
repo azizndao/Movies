@@ -6,9 +6,12 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.movies.R
-import com.example.movies.databinding.MovieItemBinding
 import com.example.movies.data.model.Movie
+import com.example.movies.databinding.MovieItemBinding
+import com.example.movies.utils.loadImage
+import com.example.movies.utils.yearFromDate
 
 class MovieListAdapter(
     private val onMovieClick: (View, Movie) -> Unit
@@ -28,12 +31,19 @@ class MovieListAdapter(
         LayoutInflater.from(parent.context).inflate(R.layout.movie_item, parent, false)
     ) {
 
-        private val binding = MovieItemBinding.bind(itemView).apply {
-            setOnClick { onClick(it, movie!!) }
-        }
+        private val binding = MovieItemBinding.bind(itemView)
 
         fun bindTo(movie: Movie?) {
-            binding.movie = movie
+            with(binding) {
+                if (movie != null) {
+                    cover.setOnClickListener { onClick(it, movie) }
+
+                    cover.loadImage(movie.posterPath ?: movie.backdropPath)
+
+                    title.text = movie.title
+                    description.yearFromDate(movie.releaseDate)
+                }
+            }
         }
     }
 

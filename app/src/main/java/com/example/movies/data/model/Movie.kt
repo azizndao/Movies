@@ -2,17 +2,18 @@ package com.example.movies.data.model
 
 
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
+@Entity(tableName = "movies")
 @Parcelize
 @Serializable
 data class Movie(
-    val id: Long,
+    @PrimaryKey val id: Long,
 
     val adult: Boolean,
 

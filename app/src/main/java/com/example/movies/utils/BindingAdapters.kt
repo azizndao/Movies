@@ -1,29 +1,17 @@
 package com.example.movies.utils
 
-import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.databinding.BindingAdapter
-import coil.load
+import com.bumptech.glide.Glide
+import com.example.movies.R
 
-@BindingAdapter(
-    "imageUrl",
-    "themoviedbUrl",
-    "placeholder",
-    "error",
-    "allowHardware",
-    "imageWidth",
-    requireAll = false
-)
 fun ImageView.loadImage(
     imageUrl: String?,
-    themoviedb: Boolean?,
-    placeholder: Drawable?,
-    error: Drawable?,
-    allowHardware: Boolean?,
+    themoviedb: Boolean? = true,
+    placeholder: Int = R.drawable.movie_placeholder,
+    error: Int = R.drawable.movie_placeholder,
     imageWidth: Int? = null,
-
-    ) {
+) {
     val url = when {
         themoviedb != false && imageUrl != null -> imageWidth?.let {
             ImageHelper.getImage(it, imageUrl)
@@ -31,14 +19,12 @@ fun ImageView.loadImage(
 
         else -> imageUrl
     }
-    load(url) {
-        if (placeholder != null) placeholder(placeholder)
-        if (error != null) error(error)
-        allowHardware(allowHardware ?: true)
-    }
+    Glide.with(this).load(url)
+        .placeholder(placeholder)
+        .error(error)
+        .into(this)
 }
 
-@BindingAdapter("yearFromDate")
 fun TextView.yearFromDate(date: String?) {
     text = if (date.isNullOrEmpty()) {
         "Unknown"
